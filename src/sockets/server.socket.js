@@ -2,18 +2,16 @@ const {  Server } = require('socket.io')
 const cookie = require('cookie')
 const jwt = require('jsonwebtoken')
 const userModel = require('../models/user.model')
+const aiService = require('../services/ai.service')
 
 function initSocketServer(httpServer){
     const io = new Server(httpServer,{})
 
     io.use(async(socket,next)=> {
         const cookies = cookie.parse(socket.handshake.headers?.cookie || "")
-
-        console.log(cookies);
         if(!cookies.token){
             next(new Error("Authentication Error: no token provided"))
             console.log("cokies.token=",cookies.token);
-            
         }
         try {
             const decoded = jwt.verify(cookies.token,process.env.SECRET_KEY)
@@ -29,7 +27,18 @@ function initSocketServer(httpServer){
     })
 
     io.on('connection',(socket) => {
-        console.log("New socket connection",socket.id);    
+        
+        socket.on('ai-message',async(messagePayload) => {
+            console.log(messagePayload);
+
+            const response = await aiService.generateResponse(messagePayload.content)
+
+            socket.emit('ai-response',{
+                content:response,
+                chat: messagePayload.chat
+            })
+            
+        })
     })
 }
 
