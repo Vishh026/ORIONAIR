@@ -3,6 +3,7 @@ const cookie = require('cookie')
 const jwt = require('jsonwebtoken')
 const userModel = require('../models/user.model')
 const aiService = require('../services/ai.service')
+const messageModel = require('../models/message.model')
 
 function initSocketServer(httpServer){
     const io = new Server(httpServer,{})
@@ -30,8 +31,21 @@ function initSocketServer(httpServer){
         
         socket.on('ai-message',async(messagePayload) => {
             console.log(messagePayload);
+            await messageModel.create({
+                user: socket.user._id,
+                content: messagePayload.content,
+                chat: messagePayload.chat,
+                role:"user"
+            })
 
             const response = await aiService.generateResponse(messagePayload.content)
+
+            await messageModel.create({
+                user: socket.user._id,
+                content: response,
+                chat: messagePayload.chat,
+                role:"model"
+            })
 
             socket.emit('ai-response',{
                 content:response,
