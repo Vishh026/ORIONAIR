@@ -30,7 +30,7 @@ function initSocketServer(httpServer){
     io.on('connection',(socket) => {
         
         socket.on('ai-message',async(messagePayload) => {
-            console.log(messagePayload);
+
             await messageModel.create({
                 user: socket.user._id,
                 content: messagePayload.content,
@@ -38,7 +38,18 @@ function initSocketServer(httpServer){
                 role:"user"
             })
 
-            const response = await aiService.generateResponse(messagePayload.content)
+            const chatHistory = await messageModel.find({
+                chat:messagePayload.chat
+            })
+           console.log("chatHistory",);
+           
+            
+            const response = await aiService.generateResponse(chatHistory.map(item=> {
+            return {
+                role:item.role,
+                parts:[{text: item.content}]
+            }
+           }))
 
             await messageModel.create({
                 user: socket.user._id,
