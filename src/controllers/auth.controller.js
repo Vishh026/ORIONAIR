@@ -65,7 +65,7 @@ async function loginUser(req, res) {
   }
 
   const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY);
-  console.log("token",token);
+  console.log("login token=",token);
   
   res.cookie("token", token);
 
