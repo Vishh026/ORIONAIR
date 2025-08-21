@@ -1,0 +1,22 @@
+const mongoose = require('mongoose')
+
+const chatSchema = new mongoose.Schema({
+    user:{
+        type: mongoose.Schema.Types.ObjectId,
+        required:true,
+        ref:'user'
+    },
+    title:{
+        type:String,
+        requied:true
+    },
+    lastActivity:{
+        type:Date,
+        default:Date.now
+    }
+
+})
+
+const chatModel = mongoose.model('chat',chatSchema)
+
+module.exports = chatModel
