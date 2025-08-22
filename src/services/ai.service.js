@@ -7,7 +7,6 @@ async function generateResponse(content) {
     model: "gemini-2.0-flash",
     contents: content,
   });
-  console.log(response.text);
   return response.text
 }
 
