@@ -20,7 +20,7 @@ async function queryMemory({ queryVector, limit = 3, metadata }) {
   const data = await orionAIIndex.query({
     vector: queryVector,
     topK: limit,
-    filter: metadata ? { metadate } : undefined,
+    filter: metadata ? { metadata } : undefined,
     includeMetadata: true,
   });
   return data.matches;
